@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gerador de Avaliação - Cultura Digital</title>
 <style>
-  /* Reset básico e layout */
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #d0e8ff; /* azul claro */
+    background: #d0e8ff;
     margin: 0;
     padding: 40px 20px;
     display: flex;
@@ -99,9 +98,12 @@
     user-select: text;
     color: #1e40af;
   }
-  /* Ícone do botão copiar */
   .btn-icon {
     font-size: 1.3rem;
+  }
+  #copiarBtn {
+    margin-left: 10px;
+    display: none;
   }
 </style>
 </head>
@@ -155,7 +157,7 @@
       <span aria-hidden="true">📄</span> Gerar Avaliação
     </button>
 
-    <button id="copiarBtn" onclick="copiarTexto()" style="display:none; margin-left: 10px;">
+    <button id="copiarBtn" onclick="copiarTexto()">
       <span class="btn-icon" aria-hidden="true">📋</span> Copiar Texto
     </button>
 
@@ -280,4 +282,14 @@
     navigator.clipboard.writeText(texto).then(() => {
       const btn = document.getElementById('copiarBtn');
       btn.innerText = "✅ Copiado!";
-      setTimeout(() =>
+      setTimeout(() => {
+        btn.innerHTML = '<span class="btn-icon" aria-hidden="true">📋</span> Copiar Texto';
+      }, 2000);
+    }).catch(err => {
+      alert("Erro ao copiar o texto: " + err);
+    });
+  }
+</script>
+
+</body>
+</html>
