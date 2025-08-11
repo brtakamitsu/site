@@ -5,88 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gerador de Avaliação - Cultura Digital</title>
 <style>
-  /* (Você pode copiar o CSS estiloso que eu te mandei antes aqui) */
-  /* Por brevidade, deixo só um estilo simples */
+  /* Reset básico e layout */
   body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 600px;
-    margin: auto;
-    background: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #d0e8ff; /* azul claro */
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
   }
-  label, select, input, textarea, button {
-    display: block;
+  .container {
+    background: #f9fbff;
+    border: 3px solid #a3c4ff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    max-width: 640px;
     width: 100%;
-    margin-bottom: 15px;
+    padding: 30px 40px;
+    box-sizing: border-box;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: #1e3a8a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  h2 .icon {
+    font-size: 2.5rem;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #334155;
+  }
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 8px #3b82f6aa;
+  }
+  textarea {
+    min-height: 100px;
   }
   button {
-    width: auto;
-    padding: 10px 20px;
-    background: #2b6cb0;
+    background-color: #2563eb;
     color: white;
     border: none;
+    padding: 14px 28px;
+    border-radius: 14px;
     cursor: pointer;
-    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 5px 12px rgba(37, 99, 235, 0.5);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button:hover:not(:disabled) {
+    background-color: #1d4ed8;
+    box-shadow: 0 7px 18px rgba(29, 78, 216, 0.6);
+  }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
   }
   #resultado {
-    margin-top: 20px;
-    padding: 15px;
-    background: #edf2f7;
-    border-radius: 8px;
-    min-height: 120px;
+    margin-top: 30px;
+    background: #e0f2fe;
+    border-radius: 16px;
+    border: 2px solid #93c5fd;
+    padding: 24px 28px;
+    min-height: 140px;
+    font-size: 1.15rem;
+    line-height: 1.6;
     white-space: pre-wrap;
+    user-select: text;
+    color: #1e40af;
+  }
+  /* Ícone do botão copiar */
+  .btn-icon {
+    font-size: 1.3rem;
   }
 </style>
 </head>
 <body>
+  <div class="container">
+    <h2><span class="icon" aria-hidden="true">📚</span> Gerador de Avaliação - Cultura Digital</h2>
 
-<h2>Gerador de Avaliação - Cultura Digital</h2>
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" placeholder="Digite o nome do aluno" autocomplete="off" />
 
-<label for="nome">Nome:</label>
-<input type="text" id="nome" placeholder="Digite o nome do aluno" />
+    <label for="genero">Gênero:</label>
+    <select id="genero">
+      <option value="menino">Menino</option>
+      <option value="menina">Menina</option>
+      <option value="outro">Outro</option>
+    </select>
 
-<label for="genero">Gênero:</label>
-<select id="genero">
-  <option value="menino">Menino</option>
-  <option value="menina">Menina</option>
-  <option value="outro">Outro</option>
-</select>
+    <label for="participacao">Participação em sala:</label>
+    <select id="participacao">
+      <option value="alta">Alta</option>
+      <option value="media">Média</option>
+      <option value="baixa">Baixa</option>
+    </select>
 
-<label for="participacao">Participação em sala:</label>
-<select id="participacao">
-  <option value="alta">Alta</option>
-  <option value="media">Média</option>
-  <option value="baixa">Baixa</option>
-</select>
+    <label for="comportamento">Comportamento:</label>
+    <select id="comportamento">
+      <option value="respeitoso">Respeitoso</option>
+      <option value="colaborativo">Colaborativo</option>
+      <option value="cuidadoso">Cuidadoso</option>
+      <option value="conflituoso">Conflituoso</option>
+    </select>
 
-<label for="comportamento">Comportamento:</label>
-<select id="comportamento">
-  <option value="respeitoso">Respeitoso</option>
-  <option value="colaborativo">Colaborativo</option>
-  <option value="cuidadoso">Cuidadoso</option>
-  <option value="conflituoso">Conflituoso</option>
-</select>
+    <label for="interesse">Nível de interesse:</label>
+    <select id="interesse">
+      <option value="alto">Alto</option>
+      <option value="medio">Médio</option>
+      <option value="baixo">Baixo</option>
+    </select>
 
-<label for="interesse">Nível de interesse:</label>
-<select id="interesse">
-  <option value="alto">Alto</option>
-  <option value="medio">Médio</option>
-  <option value="baixo">Baixo</option>
-</select>
+    <label for="habilidadeComputador">Habilidade em manusear o computador:</label>
+    <select id="habilidadeComputador">
+      <option value="sem dificuldades">Sem dificuldades</option>
+      <option value="com algumas dificuldades">Com algumas dificuldades</option>
+      <option value="necessita de apoio constante">Necessita de apoio constante</option>
+    </select>
 
-<label for="habilidadeComputador">Habilidade em manusear o computador:</label>
-<select id="habilidadeComputador">
-  <option value="sem dificuldades">Sem dificuldades</option>
-  <option value="com algumas dificuldades">Com algumas dificuldades</option>
-  <option value="necessita de apoio constante">Necessita de apoio constante</option>
-</select>
+    <label for="observacoes">Observações adicionais:</label>
+    <textarea id="observacoes" placeholder="Digite aqui observações adicionais..."></textarea>
 
-<label for="observacoes">Observações adicionais:</label>
-<textarea id="observacoes" placeholder="Digite aqui observações adicionais..."></textarea>
+    <button onclick="criarAvaliacao()">
+      <span aria-hidden="true">📄</span> Gerar Avaliação
+    </button>
 
-<button onclick="criarAvaliacao()">📄 Gerar Avaliação</button>
+    <button id="copiarBtn" onclick="copiarTexto()" style="display:none; margin-left: 10px;">
+      <span class="btn-icon" aria-hidden="true">📋</span> Copiar Texto
+    </button>
 
-<div id="resultado" aria-live="polite"></div>
+    <div id="resultado" aria-live="polite"></div>
+  </div>
 
 <script>
   function fraseAleatoria(array) {
@@ -184,7 +258,6 @@
       ]
     };
 
-    // Construindo a avaliação
     let avaliacao = `Durante as aulas de Cultura Digital, ${nome} ${fraseAleatoria(frasesParticipacao[participacao])}. `;
     avaliacao += `${fraseAleatoria(frasesComportamento[comportamento])}. `;
     avaliacao += `${fraseAleatoria(frasesInteresse[interesse])}. `;
@@ -195,8 +268,16 @@
     }
 
     document.getElementById('resultado').innerText = avaliacao;
+    document.getElementById('copiarBtn').style.display = 'inline-flex';
   }
-</script>
 
-</body>
-</html>
+  function copiarTexto() {
+    const texto = document.getElementById('resultado').innerText;
+    if (!texto) {
+      alert('Nenhum texto para copiar.');
+      return;
+    }
+    navigator.clipboard.writeText(texto).then(() => {
+      const btn = document.getElementById('copiarBtn');
+      btn.innerText = "✅ Copiado!";
+      setTimeout(() =>
