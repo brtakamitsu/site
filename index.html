@@ -1,126 +1,202 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login com Firebase + Firestore2</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
-    input, button { display: block; width: 100%; margin: 10px 0; padding: 8px; }
-    .hidden { display: none; }
-    #userData { background: #f1f1f1; padding: 10px; border-radius: 8px; margin-top: 10px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerador de Avaliação - Cultura Digital</title>
+<style>
+  /* (Você pode copiar o CSS estiloso que eu te mandei antes aqui) */
+  /* Por brevidade, deixo só um estilo simples */
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    background: #f5f7fa;
+  }
+  label, select, input, textarea, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  button {
+    width: auto;
+    padding: 10px 20px;
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  #resultado {
+    margin-top: 20px;
+    padding: 15px;
+    background: #edf2f7;
+    border-radius: 8px;
+    min-height: 120px;
+    white-space: pre-wrap;
+  }
+</style>
 </head>
 <body>
-  <h2>Cadastro / Login</h2>
 
-  <!-- Formulário de registro -->
-  <div id="registerDiv">
-    <input id="regName" type="text" placeholder="Nome">
-    <input id="regEmail" type="email" placeholder="Email">
-    <input id="regPassword" type="password" placeholder="Senha">
-    <button id="registerBtn">Registrar</button>
-  </div>
+<h2>Gerador de Avaliação - Cultura Digital</h2>
 
-  <!-- Formulário de login -->
-  <div id="loginDiv">
-    <input id="loginEmail" type="email" placeholder="Email">
-    <input id="loginPassword" type="password" placeholder="Senha">
-    <button id="loginBtn">Entrar</button>
-  </div>
+<label for="nome">Nome:</label>
+<input type="text" id="nome" placeholder="Digite o nome do aluno" />
 
-  <!-- Status e mensagens -->
-  <p id="status"></p>
+<label for="genero">Gênero:</label>
+<select id="genero">
+  <option value="menino">Menino</option>
+  <option value="menina">Menina</option>
+  <option value="outro">Outro</option>
+</select>
 
-  <!-- Área do usuário logado -->
-  <div id="userArea" class="hidden">
-    <h3>Bem-vindo, <span id="displayName"></span>!</h3>
-    <div id="userData"></div>
-    <button id="logoutBtn">Sair</button>
-  </div>
+<label for="participacao">Participação em sala:</label>
+<select id="participacao">
+  <option value="alta">Alta</option>
+  <option value="media">Média</option>
+  <option value="baixa">Baixa</option>
+</select>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getFirestore, setDoc, doc, getDoc }
-      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+<label for="comportamento">Comportamento:</label>
+<select id="comportamento">
+  <option value="respeitoso">Respeitoso</option>
+  <option value="colaborativo">Colaborativo</option>
+  <option value="cuidadoso">Cuidadoso</option>
+  <option value="conflituoso">Conflituoso</option>
+</select>
 
-    // CONFIGURAÇÃO DO FIREBASE (cole a sua aqui)
-    const firebaseConfig = {
-      apiKey: "AIzaSyC1FvjEuCO_w6RPGlecR3pqalaawbrbVLQ",
-      authDomain: "geradorparecer.firebaseapp.com",
-      projectId: "geradorparecer",
-      storageBucket: "geradorparecer.firebasestorage.app",
-      messagingSenderId: "618649414057,
-      appId: "G-BH3H4VN3GB"
+<label for="interesse">Nível de interesse:</label>
+<select id="interesse">
+  <option value="alto">Alto</option>
+  <option value="medio">Médio</option>
+  <option value="baixo">Baixo</option>
+</select>
+
+<label for="habilidadeComputador">Habilidade em manusear o computador:</label>
+<select id="habilidadeComputador">
+  <option value="sem dificuldades">Sem dificuldades</option>
+  <option value="com algumas dificuldades">Com algumas dificuldades</option>
+  <option value="necessita de apoio constante">Necessita de apoio constante</option>
+</select>
+
+<label for="observacoes">Observações adicionais:</label>
+<textarea id="observacoes" placeholder="Digite aqui observações adicionais..."></textarea>
+
+<button onclick="criarAvaliacao()">📄 Gerar Avaliação</button>
+
+<div id="resultado" aria-live="polite"></div>
+
+<script>
+  function fraseAleatoria(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  function criarAvaliacao() {
+    const nome = document.getElementById('nome').value.trim();
+    const genero = document.getElementById('genero').value;
+    const participacao = document.getElementById('participacao').value;
+    const comportamento = document.getElementById('comportamento').value;
+    const interesse = document.getElementById('interesse').value;
+    const habilidadeComputador = document.getElementById('habilidadeComputador').value;
+    const observacoes = document.getElementById('observacoes').value.trim();
+
+    if (!nome) {
+      alert('Por favor, preencha o nome.');
+      return;
+    }
+
+    const frasesParticipacao = {
+      alta: [
+        "demonstrou grande engajamento e interesse durante as aulas, participando ativamente das atividades propostas e contribuindo positivamente para o ambiente de aprendizagem",
+        "esteve sempre presente nas discussões e tarefas, mostrando entusiasmo e dedicação ao longo do trimestre",
+        "participou com entusiasmo e colaborou efetivamente nas atividades em grupo, evidenciando compromisso com o próprio aprendizado"
+      ],
+      media: [
+        "participou de forma consistente, mostrando boa interação com a turma e interesse nas atividades propostas",
+        "esteve atento e colaborou em vários momentos, evidenciando um envolvimento gradual com os conteúdos trabalhados",
+        "demonstrou interesse e contribuiu de maneira significativa em diversas atividades, buscando sempre melhorar"
+      ],
+      baixa: [
+        "teve uma participação mais reservada, aproveitando os momentos de interação para aprender e observar",
+        "interagiu pontualmente, mas pode ampliar seu envolvimento nas atividades para potencializar o aprendizado",
+        "aproveitou as oportunidades de participação quando se sentiu confortável, com espaço para desenvolver maior engajamento"
+      ]
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    const frasesComportamento = {
+      respeitoso: [
+        "Mantém uma postura respeitosa e cordial com colegas e professores, colaborando para um ambiente harmonioso e saudável",
+        "Demonstra respeito e consideração no ambiente escolar, valorizando o convívio social e o trabalho em grupo",
+        "Trata todos com cordialidade e atenção, contribuindo para o fortalecimento das relações interpessoais na turma"
+      ],
+      colaborativo: [
+        "Colabora ativamente com o grupo e incentiva o trabalho em equipe, fortalecendo o espírito coletivo",
+        "Contribui para o trabalho coletivo e ajuda colegas quando necessário, demonstrando empatia e responsabilidade",
+        "Mostra espírito de equipe e disposição para apoiar os demais, promovendo um ambiente colaborativo e positivo"
+      ],
+      cuidadoso: [
+        "Cuida dos materiais e recursos utilizados, prezando pela organização e bom uso dos equipamentos",
+        "Demonstra atenção aos detalhes e zelo com os equipamentos, contribuindo para a conservação dos recursos da escola",
+        "Preocupa-se em manter o espaço de trabalho limpo e organizado, respeitando as normas e o ambiente escolar"
+      ],
+      conflituoso: [
+        "Envolve-se em constantes conflitos, o que requer a intervenção do professor para mediar situações e garantir um ambiente adequado",
+        "Apresenta dificuldades em lidar com situações de conflito, demandando atenção especial e acompanhamento contínuo",
+        "Necessita de acompanhamento para administrar conflitos e promover um ambiente mais harmonioso, buscando desenvolver habilidades socioemocionais"
+      ]
+    };
 
-    // Função de registro
-    async function register() {
-      const name = document.getElementById("regName").value;
-      const email = document.getElementById("regEmail").value;
-      const password = document.getElementById("regPassword").value;
+    const frasesInteresse = {
+      alto: [
+        "Busca sempre explorar e compreender os temas abordados, demonstrando curiosidade e vontade de aprofundar o conhecimento",
+        "Demonstra grande interesse pelos conteúdos trabalhados, participando ativamente e questionando para ampliar sua aprendizagem",
+        "Mostra entusiasmo nas atividades propostas, o que favorece seu desenvolvimento e progresso acadêmico"
+      ],
+      medio: [
+        "Mantém um bom nível de interesse nas atividades, participando com constância e atenção",
+        "Mostra disposição para aprender e explorar os temas de forma gradual, apresentando progressos contínuos",
+        "Demonstra curiosidade e atenção nas propostas realizadas, com potencial para ampliar seu envolvimento"
+      ],
+      baixo: [
+        "Mostra interesse em pontos específicos, mas pode ampliar esse engajamento para melhor aproveitamento das aulas",
+        "Participa de forma seletiva, com potencial para maior envolvimento nas atividades propostas",
+        "Demonstra curiosidade em momentos-chave das aulas, com espaço para desenvolver maior interesse e participação"
+      ]
+    };
 
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await setDoc(doc(db, "users", userCredential.user.uid), { name, email });
-        document.getElementById("status").innerText = "Cadastro realizado!";
-        console.log("Usuário registrado:", userCredential.user.uid);
-      } catch (error) {
-        document.getElementById("status").innerText = error.message;
-        console.error("Erro no registro:", error);
-      }
+    const frasesHabilidadeComputador = {
+      "sem dificuldades": [
+        "Manuseia o computador com facilidade e segurança, realizando as tarefas com autonomia e confiança",
+        "Demonstrou boa habilidade ao utilizar os recursos digitais disponíveis, facilitando seu aprendizado",
+        "Apresenta confiança no uso das ferramentas tecnológicas durante as atividades, o que contribui para seu desenvolvimento"
+      ],
+      "com algumas dificuldades": [
+        "Enfrenta algumas dificuldades no manuseio do computador, mas tem se esforçado para superar os desafios e melhorar suas habilidades",
+        "Apresenta desafios pontuais no uso das ferramentas digitais, com progresso contínuo e determinação",
+        "Precisa de apoio em certas etapas, mas está evoluindo no aprendizado tecnológico e buscando autonomia"
+      ],
+      "necessita de apoio constante": [
+        "Necessita de apoio constante para realizar atividades no computador, demonstrando esforço para aprender e progredir",
+        "Encontra dificuldades significativas no manuseio das ferramentas digitais, requerendo acompanhamento próximo do professor",
+        "Depende de orientação frequente para utilização dos recursos tecnológicos, mas mostra empenho e interesse em melhorar"
+      ]
+    };
+
+    // Construindo a avaliação
+    let avaliacao = `Durante as aulas de Cultura Digital, ${nome} ${fraseAleatoria(frasesParticipacao[participacao])}. `;
+    avaliacao += `${fraseAleatoria(frasesComportamento[comportamento])}. `;
+    avaliacao += `${fraseAleatoria(frasesInteresse[interesse])}. `;
+    avaliacao += `${fraseAleatoria(frasesHabilidadeComputador[habilidadeComputador])}.`;
+
+    if (observacoes) {
+      avaliacao += ` ${observacoes}`;
     }
 
-    // Função de login
-    async function login() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
+    document.getElementById('resultado').innerText = avaliacao;
+  }
+</script>
 
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        document.getElementById("status").innerText = "Login bem-sucedido!";
-        console.log("Usuário logado:", userCredential.user.uid);
-      } catch (error) {
-        document.getElementById("status").innerText = error.message;
-        console.error("Erro no login:", error);
-      }
-    }
-
-    // Função de logout
-    async function logout() {
-      await signOut(auth);
-      console.log("Usuário deslogado");
-    }
-
-    // Observa mudanças no login
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById("registerDiv").classList.add("hidden");
-        document.getElementById("loginDiv").classList.add("hidden");
-        document.getElementById("userArea").classList.remove("hidden");
-
-        const docSnap = await getDoc(doc(db, "users", user.uid));
-        if (docSnap.exists()) {
-          document.getElementById("displayName").innerText = docSnap.data().name;
-          document.getElementById("userData").innerText = JSON.stringify(docSnap.data(), null, 2);
-        }
-      } else {
-        document.getElementById("registerDiv").classList.remove("hidden");
-        document.getElementById("loginDiv").classList.remove("hidden");
-        document.getElementById("userArea").classList.add("hidden");
-      }
-    });
-
-    // Liga botões às funções
-    document.getElementById("registerBtn").addEventListener("click", register);
-    document.getElementById("loginBtn").addEventListener("click", login);
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-  </script>
 </body>
 </html>
