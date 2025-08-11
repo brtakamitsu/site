@@ -1,25 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login com Firebase</title>
+  <title>Login com Firebase + Firestore</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
+    input, button { display: block; width: 100%; margin: 10px 0; padding: 8px; }
+    .hidden { display: none; }
+    #userData { background: #f1f1f1; padding: 10px; border-radius: 8px; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <h1>Login</h1>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Senha">
-  <button onclick="register()">Registrar</button>
-  <button onclick="login()">Entrar</button>
+  <h2>Cadastro / Login</h2>
+
+  <!-- Formulário de registro -->
+  <div id="registerDiv">
+    <input id="regName" type="text" placeholder="Nome">
+    <input id="regEmail" type="email" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Senha">
+    <button onclick="register()">Registrar</button>
+  </div>
+
+  <!-- Formulário de login -->
+  <div id="loginDiv">
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <!-- Status e mensagens -->
   <p id="status"></p>
+
+  <!-- Área do usuário logado -->
+  <div id="userArea" class="hidden">
+    <h3>Bem-vindo, <span id="displayName"></span>!</h3>
+    <div id="userData"></div>
+    <button onclick="logout()">Sair</button>
+  </div>
 
   <!-- Firebase SDK -->
   <script type="module">
-    // Importar módulos Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getFirestore, setDoc, doc, getDoc }
+      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-    // Configuração do seu projeto Firebase (cole a sua aqui)
+    // CONFIGURAÇÃO DO FIREBASE (cole a sua aqui)
     const firebaseConfig = {
       apiKey: "AIzaSyC1FvjEuCO_w6RPGlecR3pqalaawbrbVLQ",
       authDomain: "geradorparecer.firebaseapp.com",
@@ -29,35 +56,64 @@
       appId: "G-BH3H4VN3GB"
     };
 
-    // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Função de registro
-    window.register = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-          document.getElementById("status").innerText = "Usuário registrado!";
-        })
-        .catch(error => {
-          document.getElementById("status").innerText = error.message;
-        });
+    // REGISTRAR
+    window.register = async function() {
+      const name = document.getElementById("regName").value;
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, "users", userCredential.user.uid), { name, email });
+        document.getElementById("status").innerText = "Cadastro realizado!";
+      } catch (error) {
+        document.getElementById("status").innerText = error.message;
+      }
     };
 
-    // Função de login
-    window.login = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-          document.getElementById("status").innerText = "Login bem-sucedido!";
-        })
-        .catch(error => {
-          document.getElementById("status").innerText = error.message;
-        });
+    // LOGIN
+    window.login = async function() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        document.getElementById("status").innerText = "Login bem-sucedido!";
+      } catch (error) {
+        document.getElementById("status").innerText = error.message;
+      }
     };
+
+    // LOGOUT
+    window.logout = async function() {
+      await signOut(auth);
+    };
+
+    // OBSERVADOR DE LOGIN
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Oculta formulários e mostra área logada
+        document.getElementById("registerDiv").classList.add("hidden");
+        document.getElementById("loginDiv").classList.add("hidden");
+        document.getElementById("userArea").classList.remove("hidden");
+
+        // Busca dados no Firestore
+        const docSnap = await getDoc(doc(db, "users", user.uid));
+        if (docSnap.exists()) {
+          document.getElementById("displayName").innerText = docSnap.data().name;
+          document.getElementById("userData").innerText = JSON.stringify(docSnap.data(), null, 2);
+        }
+      } else {
+        // Mostra formulários e esconde área logada
+        document.getElementById("registerDiv").classList.remove("hidden");
+        document.getElementById("loginDiv").classList.remove("hidden");
+        document.getElementById("userArea").classList.add("hidden");
+      }
+    });
   </script>
 </body>
 </html>
