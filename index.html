@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Login com Firebase</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Senha">
+  <button onclick="register()">Registrar</button>
+  <button onclick="login()">Entrar</button>
+  <p id="status"></p>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Importar módulos Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+    // Configuração do seu projeto Firebase (cole a sua aqui)
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1FvjEuCO_w6RPGlecR3pqalaawbrbVLQ",
+      authDomain: "geradorparecer.firebaseapp.com",
+      projectId: "geradorparecer",
+      storageBucket: "geradorparecer.firebasestorage.app",
+      messagingSenderId: "618649414057,
+      appId: "G-BH3H4VN3GB"
+    };
+
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Função de registro
+    window.register = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          document.getElementById("status").innerText = "Usuário registrado!";
+        })
+        .catch(error => {
+          document.getElementById("status").innerText = error.message;
+        });
+    };
+
+    // Função de login
+    window.login = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(userCredential => {
+          document.getElementById("status").innerText = "Login bem-sucedido!";
+        })
+        .catch(error => {
+          document.getElementById("status").innerText = error.message;
+        });
+    };
+  </script>
+</body>
+</html>
